@@ -50,6 +50,33 @@ class TestAccountService(TestCase):
         """Runs once after each test case"""
         db.session.remove()
 
+    def test_read_an_account(self):
+        """It should read an account"""
+        # Create an account first using the helper method
+        account = AccountFactory()
+        response = self.client.post(BASE_URL, json=account.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        
+        # Get the account ID from the response
+        account_data = response.get_json()
+        account_id = account_data["id"]
+        
+        # Read the account
+        response = self.client.get(f"{BASE_URL}/{account_id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        # Check that the returned data matches what we sent
+        data = response.get_json()
+        self.assertEqual(data["name"], account.name)
+        self.assertEqual(data["email"], account.email)
+        self.assertEqual(data["address"], account.address)
+        self.assertEqual(data["phone_number"], account.phone_number)
+
+    def test_account_not_found(self):
+        """It should not read an account that is not found"""
+        response = self.client.get(f"{BASE_URL}/0")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
     ######################################################################
     #  H E L P E R   M E T H O D S
     ######################################################################
