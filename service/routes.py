@@ -72,7 +72,7 @@ def list_accounts():
     results = [account.serialize() for account in accounts]
     
     app.logger.info("Returning %d accounts", len(results))
-    return results, status.HTTP_200_OK
+    return jsonify(results), status.HTTP_200_OK 
 
 
 ######################################################################
